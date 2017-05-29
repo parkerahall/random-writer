@@ -13,6 +13,7 @@ import java.util.Set;
 public class RandomFile {
     
     private static final Set<Character> QUOTES = new HashSet<>(Arrays.asList('\'', '\"'));
+    private static final Set<Character> PUNCTUATION = new HashSet<>(Arrays.asList('.', '?', '!'));
     
     private StringDistribution probabilities = new StringDistribution();
     
@@ -25,6 +26,7 @@ public class RandomFile {
                 for (String word: words) {
                     addWord(word);
                 }
+                line = reader.readLine();
             }
             reader.close();
         } catch (IOException ioe) {
@@ -37,6 +39,19 @@ public class RandomFile {
         for (String word: words) {
             addWord(word);
         }
+    }
+    
+    /**
+     * creates new RandomFile from probability distribution
+     * @param dist distribution of words
+     */
+    public RandomFile(StringDistribution dist) {
+        probabilities = dist;
+    }
+    
+    public RandomFile combine(RandomFile that) {
+        StringDistribution newDist = this.probabilities.combine(that.probabilities);
+        return new RandomFile(newDist);
     }
     
     public void addWord(String word) {
@@ -61,12 +76,17 @@ public class RandomFile {
     
     /**
      * creates randomized String equal in word length to input
+     * @param numWords number of words in output String
      * @return String of randomized words separated by whitespace
      */
-    public String randomOutput() {
+    public String randomOutput(int numWords) {
         String output = "";
-        for (int i = 0; i < probabilities.getTotal(); i++) {
-            output += probabilities.randomSelect() + " ";
+        for (int i = 0; i < numWords; i++) {
+            String newWord = probabilities.randomSelect();
+            if (output.length() > 2 && PUNCTUATION.contains(output.charAt(output.length() - 2)) || output.length() == 0) {
+                newWord = Character.toUpperCase(newWord.charAt(0)) + newWord.substring(1);
+            }
+            output += newWord + " ";
         }
         return output;
     }
@@ -77,7 +97,7 @@ public class RandomFile {
     }
     
     public static void main(String[] args) {
-        RandomFile check = new RandomFile("Hello everyone! How is everyone doing?");
-        System.out.println(check.randomOutput());
+        RandomFile check = new RandomFile("Hey everyone! How is everyone doing? I'd like to have a little chat.");
+        System.out.println(check.randomOutput(12));
     }
 }

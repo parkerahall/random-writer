@@ -3,6 +3,7 @@ package random_writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -143,7 +144,9 @@ public class StringDistribution implements Distribution<String> {
 
     @Override
     public Set<String> sampleSpace() {
-        return probabilities.keySet();
+        Set<String> sampleSpace = new HashSet<>();
+        sampleSpace.addAll(probabilities.keySet());
+        return sampleSpace;
     }
     
     @Override
